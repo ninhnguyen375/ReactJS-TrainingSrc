@@ -1,3 +1,8 @@
+## Install Environment
+
+1. Install NodeJS
+2. Install Visual Studio Code
+
 ## Install & start project
 
 1. npm install

@@ -61,5 +61,7 @@
 - CSS Peek
 - S7+ React/Redux/React-Native snippets
 - IntelliCode
+- ESLint
+- GitLens
 
 ### Restart after installation

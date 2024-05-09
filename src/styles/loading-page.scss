@@ -1,0 +1,21 @@
+.loading-page {
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.606);
+  position: fixed;
+  top: 0;
+  left: 0;
+  background-image: url(/liquid-cheese.png);
+  background-repeat: no-repeat;
+  background-size: cover;
+  opacity: 0.5;
+  background-blend-mode: darken;
+  z-index: 3;
+
+  .loading-page-spinner {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+}

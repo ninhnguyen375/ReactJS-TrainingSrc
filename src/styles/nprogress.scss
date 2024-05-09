@@ -1,0 +1,37 @@
+$primary-color: #5ac2dc;
+
+// nprogress
+#nprogress .spinner {
+  top: 10px;
+  left: 50%;
+  right: auto;
+  transform: translate(-50%, 0);
+  z-index: 10000;
+  background: white;
+  padding: 6px 10px 6px 10px;
+  box-shadow: 0 0 5px #eeeeee;
+  border: 1px solid #eeeeee;
+  border-radius: 5px;
+  display: flex;
+  font-weight: bold;
+  width: 111px;
+
+  &-icon {
+    border-top-color: $primary-color;
+    border-left-color: $primary-color;
+    width: 15px;
+    height: 15px;
+    margin-top: 1px;
+  }
+
+  &:after {
+    content: 'ĐANG TẢI';
+    font-size: 0.8em;
+    margin-left: 5px;
+  }
+}
+#nprogress .bar {
+  height: 3px;
+  z-index: 10000;
+  background: $primary-color;
+}

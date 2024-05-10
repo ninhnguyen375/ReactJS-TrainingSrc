@@ -215,6 +215,10 @@ const lists = {
   WorkLocation: {
     site: config.GEMBA_PRD_SITE,
     listName: 'WorkLocation'
+  },
+  TodoList: {
+    site: config.TRAINING_SITE,
+    listName: 'TodoList'
   }
 }
 

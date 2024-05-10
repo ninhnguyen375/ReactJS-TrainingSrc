@@ -26,6 +26,14 @@ const MainLayout = ({ children }) => {
       key: 'home',
       url: '/',
       image: '/menu-profile-contractor.png'
+    },
+
+    {
+      title: 'Todo',
+      subTitle: 'Todo list',
+      key: 'todo-list',
+      url: '/todo-list',
+      image: '/menu-profile-contractor.png'
     }
   ]
 

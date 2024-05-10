@@ -19,6 +19,7 @@ import dayjs from 'dayjs'
 
 import locale from 'antd/locale/vi_VN'
 import 'dayjs/locale/vi'
+import TodoListPage from '../components/TodoList/TodoListPage'
 dayjs.locale('vi')
 
 const Root = () => {
@@ -52,6 +53,14 @@ const Root = () => {
               {/* auth routes */}
               <Route element={<AuthProvider />}>
                 <Route path="/change-password" element={<ChangePasswordPage />} />
+                <Route
+                  path="/todo-list"
+                  element={
+                    <MainLayout>
+                      <TodoListPage />
+                    </MainLayout>
+                  }
+                />
 
                 <Route
                   path="/"

@@ -6,6 +6,7 @@ const config = {
   PTW_CSM_SITE: 'https://suntorygroup.sharepoint.com/sites/EHS-MS/PTW-CSM',
   GEMBA_PRD_SITE: 'https://suntorygroup.sharepoint.com/sites/SPVBOPS/GEMBA/PRD',
   MOC_SITE: 'https://suntorygroup.sharepoint.com/sites/SPVBMOC/MOC',
+  TRAINING_SITE: 'https://suntorygroup.sharepoint.com/sites/SPVBOPS/GEMBA/Training',
   LAST_VERSION: '2024-04-25 17:00',
   IN_TEST: import.meta.env.VITE_IN_TEST === 'Yes',
   IGNORE_MAIL: false

@@ -42,6 +42,7 @@ UIProvider.propTypes = {
 export function useUI() {
   const { loading, setLoading, notiInfo, notiError, notiWarning, notiSuccess } =
     useContext(UIContext)
+
   return { loading, setLoading, notiInfo, notiError, notiWarning, notiSuccess }
 }
 export default UIProvider

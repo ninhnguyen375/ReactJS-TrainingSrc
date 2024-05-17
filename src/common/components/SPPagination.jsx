@@ -21,7 +21,7 @@ const SPPagination = ({
   setItems,
   items = [],
   loading,
-  setLoading
+  setLoading = () => {}
 }) => {
   const [pages, setPages] = useState([initPage])
   const [currentPage, setCurrentPage] = useState(initPage)

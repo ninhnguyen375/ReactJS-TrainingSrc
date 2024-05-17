@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import PropTypes from '../../common/PropTypes'
 import { useForm } from 'antd/es/form/Form'
 import { Form, Input } from 'antd'
@@ -6,6 +6,10 @@ import { useUI } from '../../common/UIProvider'
 import { addListItemService, updateListItemService } from '../../common/services'
 import lists from '../../common/lists'
 import AsyncButton from '../../common/components/AsyncButton'
+import AttachmentTodo from './AttachmentTodo'
+import SPImage from '../../common/components/SPImage'
+import ImageTodo from './ImageTodo'
+import { useTodoPage } from './TodoListPage'
 
 const propTypes = {
   item: PropTypes.object,
@@ -16,6 +20,11 @@ const propTypes = {
 const TodoItemForm = ({ item, onSubmit, mode = 'New' }) => {
   const [form] = useForm()
   const ui = useUI()
+
+  const [image1, setImage1] = useState(JSON.parse(item?.Image1))
+
+  const { todoItemList } = useTodoPage()
+  console.log('todoItemList: from TodoItemForm', todoItemList)
 
   const handleSave = async () => {
     try {
@@ -63,6 +72,26 @@ const TodoItemForm = ({ item, onSubmit, mode = 'New' }) => {
           ]}>
           <Input />
         </Form.Item>
+
+        {/* {image1?.serverRelativeUrl ? (
+          <div>
+            <SPImage site={lists.TodoList.site} serverRelativeUrl={image1?.serverRelativeUrl} />
+          </div>
+        ) : (
+          ''
+        )} */}
+
+        <ImageTodo
+          width={220}
+          list={lists.TodoList}
+          mode={'View'}
+          storeID={item?.ID}
+          columnName={'Image1'}
+        />
+
+        <div>
+          <AttachmentTodo list={lists.TodoList} storeID={item?.ID} preloadImage />
+        </div>
       </Form>
 
       <AsyncButton onClick={handleSave}>Save</AsyncButton>

@@ -1,9 +1,12 @@
-import React, { useEffect, useState } from 'react'
+import React, { createContext, useContext, useEffect, useState } from 'react'
 import TodoItem from './TodoItem'
-import { getItemsService } from '../../common/services'
+import { addListItemService, getItemsService } from '../../common/services'
 import lists from '../../common/lists'
 import TodoItemForm from './TodoItemForm'
 import { Button, Modal } from 'antd'
+import SPPagination from '../../common/components/SPPagination'
+
+const TodoPageContext = createContext()
 
 const TodoListPage = () => {
   const [todoItemList, setTodoItemList] = useState([])
@@ -13,19 +16,14 @@ const TodoListPage = () => {
   })
   const [isShowTodoForm, setIsShowTodoForm] = useState(false)
 
-  const getTodoList = async (filterStatus = 'All') => {
-    let filter = ''
-
-    if (filterStatus !== 'All') {
-      filter = `Status eq '${filterStatus}'`
-    }
-
+  const getTodoList = async (withLoading) => {
     let data = await getItemsService(lists.TodoList, {
-      filter: filter
+      top: 2
     })
-    data = data.value
 
-    setTodoItemList(data)
+    setTodoItemList(data.value)
+
+    return data
   }
 
   useEffect(() => {
@@ -33,64 +31,78 @@ const TodoListPage = () => {
   }, [])
 
   return (
-    <div>
-      <button onClick={() => getTodoList('Pending')}>get todo list Pending</button>
-      <button onClick={() => getTodoList('Done')}>get todo list Done</button>
-      <button onClick={() => getTodoList('All')}>get todo list All</button>
+    <TodoPageContext.Provider value={{ getTodoList, todoItemList }}>
+      <div>
+        <button onClick={() => getTodoList('Pending')}>get todo list Pending</button>
+        <button onClick={() => getTodoList('Done')}>get todo list Done</button>
+        <button onClick={() => getTodoList('All')}>get todo list All</button>
 
-      <Button
-        onClick={() => {
-          setIsShowTodoForm(true)
-          setSelectedItem({
-            item: null,
-            mode: 'New'
-          })
-        }}>
-        Add
-      </Button>
+        <Button
+          onClick={async () => {
+            const createdItem = await addListItemService(lists.TodoList, {
+              Title: ''
+            })
 
-      {todoItemList.map((item) => {
-        return (
-          <div
-            key={item.ID}
-            onClick={() => {
-              setIsShowTodoForm(true)
-              setSelectedItem({
-                item: item,
-                mode: 'Edit'
-              })
-            }}>
-            <TodoItem todoItem={item} />
-          </div>
-        )
-      })}
+            setIsShowTodoForm(true)
+            setSelectedItem({
+              item: createdItem,
+              mode: 'Edit'
+            })
+          }}>
+          Add
+        </Button>
 
-      {isShowTodoForm ? (
-        <Modal
-          footer={[]}
-          destroyOnClose
-          title="Form Todo"
-          onCancel={() => {
-            setIsShowTodoForm(false)
-            setSelectedItem({})
-          }}
-          open={isShowTodoForm}>
-          <TodoItemForm
-            mode={selectedItem.mode}
-            item={selectedItem.item}
-            onSubmit={() => {
+        {todoItemList.map((item) => {
+          return (
+            <div
+              key={item.ID}
+              onClick={() => {
+                setIsShowTodoForm(true)
+                setSelectedItem({
+                  item: item,
+                  mode: 'Edit'
+                })
+              }}>
+              <TodoItem todoItem={item} />
+            </div>
+          )
+        })}
+
+        <SPPagination getItems={getTodoList} setItems={setTodoItemList} items={todoItemList} />
+
+        {isShowTodoForm ? (
+          <Modal
+            footer={[]}
+            destroyOnClose
+            title="Form Todo"
+            onCancel={() => {
               setIsShowTodoForm(false)
               setSelectedItem({})
-
-              getTodoList()
             }}
-          />
-        </Modal>
-      ) : (
-        ''
-      )}
-    </div>
+            open={isShowTodoForm}>
+            <TodoItemForm
+              mode={selectedItem.mode}
+              item={selectedItem.item}
+              onSubmit={() => {
+                setIsShowTodoForm(false)
+                setSelectedItem({})
+
+                getTodoList()
+              }}
+            />
+          </Modal>
+        ) : (
+          ''
+        )}
+      </div>
+    </TodoPageContext.Provider>
   )
+}
+
+export const useTodoPage = () => {
+  const { getTodoList, todoItemList } = useContext(TodoPageContext)
+
+  return { getTodoList, todoItemList }
 }
 
 export default TodoListPage

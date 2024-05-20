@@ -13,8 +13,7 @@ const AuthContext = createContext(null)
 
 const AuthProvider = () => {
   // localStorage
-  // const localProfile = JSON.parse(localStorage.getItem('profile'))
-  const [profile, setProfile] = useState(useReadLocalStorage('profile'))
+  const [profile, setProfile] = useState(useReadLocalStorage(config.LOCAL_PROFILE))
   // state
   const [isGettingUser, setIsGettingUser] = useState(true)
   const [isRefreshPage, setIsRefreshPage] = useState(true)
@@ -25,10 +24,10 @@ const AuthProvider = () => {
   const dispatch = useDispatch()
 
   const logout = () => {
-    localStorage.clear('profile')
-    localStorage.clear('authenticated')
-    localStorage.clear('accessToken')
-    localStorage.clear('refreshToken')
+    localStorage.clear(config.LOCAL_PROFILE)
+    localStorage.clear(config.LOCAL_AUTHENTICATED)
+    localStorage.clear(config.LOCAL_ACCESS_TOKEN)
+    localStorage.clear(config.LOCAL_REFRESH_TOKEN)
 
     setProfile()
 
@@ -49,7 +48,7 @@ const AuthProvider = () => {
 
       setProfile(newProfile)
 
-      localStorage.setItem('profile', JSON.stringify(newProfile))
+      localStorage.setItem(config.LOCAL_PROFILE, JSON.stringify(newProfile))
     } catch (error) {
       if (handleError(error) === '"401"') {
         try {
@@ -112,12 +111,12 @@ const AuthProvider = () => {
 
   const handleRefreshToken = async () => {
     try {
-      const refreshToken = localStorage.getItem('refreshToken')
-      const accessToken = localStorage.getItem('accessToken')
+      const refreshToken = localStorage.getItem(config.LOCAL_REFRESH_TOKEN)
+      const accessToken = localStorage.getItem(config.LOCAL_ACCESS_TOKEN)
       const newToken = await refreshTokenService(accessToken, refreshToken)
 
-      localStorage.setItem('accessToken', newToken.accessToken)
-      localStorage.setItem('refreshToken', newToken.refreshToken)
+      localStorage.setItem(config.LOCAL_ACCESS_TOKEN, newToken.accessToken)
+      localStorage.setItem(config.LOCAL_REFRESH_TOKEN, newToken.refreshToken)
 
       return newToken
     } catch (error) {

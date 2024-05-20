@@ -16,7 +16,7 @@ export const changePasswordService = async (oldPassword, newPassword) =>
   })
 
 export const getAuth = async () => {
-  const authenticated = JSON.parse(localStorage.getItem('authenticated'))
+  const authenticated = JSON.parse(localStorage.getItem(config.LOCAL_AUTHENTICATED))
 
   // get contractor detail
   const contractor = await fetchAuth({

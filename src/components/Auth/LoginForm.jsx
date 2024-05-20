@@ -4,6 +4,7 @@ import { useUI } from '../../common/UIProvider'
 import { getAuth, loginService } from '../../common/services'
 import { Button, Form, Input } from 'antd'
 import { useForm } from 'antd/es/form/Form'
+import config from '../../common/config'
 
 function LoginForm() {
   const location = useLocation()
@@ -25,13 +26,13 @@ function LoginForm() {
     try {
       const loginRes = await loginService(values.email, values.password)
 
-      localStorage.setItem('accessToken', loginRes.token.accessToken)
-      localStorage.setItem('refreshToken', loginRes.token.refreshToken)
-      localStorage.setItem('authenticated', JSON.stringify(loginRes))
+      localStorage.setItem(config.LOCAL_ACCESS_TOKEN, loginRes.token.accessToken)
+      localStorage.setItem(config.LOCAL_REFRESH_TOKEN, loginRes.token.refreshToken)
+      localStorage.setItem(config.LOCAL_AUTHENTICATED, JSON.stringify(loginRes))
 
       const newProfile = await getAuth()
 
-      localStorage.setItem('profile', JSON.stringify(newProfile))
+      localStorage.setItem(config.LOCAL_PROFILE, JSON.stringify(newProfile))
 
       if (returnUrl === '/login') {
         navigate('/', { replace: true })

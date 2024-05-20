@@ -39,7 +39,7 @@ export const fetchAuth = async ({
 }) => {
   try {
     // console.time(url)
-    const tokenKey = token || localStorage.getItem('accessToken')
+    const tokenKey = token || localStorage.getItem(config.LOCAL_ACCESS_TOKEN)
 
     const res = await axios({
       url,

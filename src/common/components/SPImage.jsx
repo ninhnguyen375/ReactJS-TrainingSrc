@@ -26,7 +26,7 @@ const SPImage = ({ serverRelativeUrl, site, ...imageProps }) => {
 
   return (
     <Image
-      loading={loadingGetImage}
+      loading={loadingGetImage ? 'eager' : 'lazy'}
       src={objUrl || '/spinner.gif'}
       style={{ backgroundColor: '#f6f6f6' }}
       {...imageProps}

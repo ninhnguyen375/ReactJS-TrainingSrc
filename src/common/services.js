@@ -8,6 +8,19 @@ import lists from './lists'
 export const loginService = async (userName, password) =>
   fetchAxios({ url: '/users/authenticate', method: 'post', data: { userName, password } })
 
+export const hashPasswordService = async (password) =>
+  fetchAxios({
+    url: '/users/hash',
+    params: { rawstring: password },
+    method: 'post'
+  })
+export const registerService = async (userName, password, confirmPassword, role, refID) =>
+  fetchAxios({
+    url: '/users',
+    method: 'post',
+    data: { userName, password, confirmPassword, role, refID }
+  })
+
 export const changePasswordService = async (oldPassword, newPassword) =>
   fetchAuth({
     url: '/users/change-password',
@@ -15,27 +28,74 @@ export const changePasswordService = async (oldPassword, newPassword) =>
     data: { old: oldPassword, new: newPassword }
   })
 
-export const getAuth = async () => {
-  const authenticated = JSON.parse(localStorage.getItem(config.LOCAL_AUTHENTICATED))
-
-  // get contractor detail
-  const contractor = await fetchAuth({
-    ignore401: true,
-    url: '/Sharepoints/',
-    params: {
-      url:
-        endpoints.getItems(config.PTW_CSM_SITE, 'Contractor') +
-        `?$filter=ContractorID eq '${authenticated.user.contractorID}'&top=1`
-    },
-    method: 'get'
+export const requestResetPasswordService = async (email) =>
+  fetchAxios({
+    url: '/users/reset/request',
+    method: 'post',
+    data: { email }
   })
 
-  const account = await getItemService(lists.Accounts, authenticated.user.id)
+export const verifyResetService = async (email, verifyCode) =>
+  fetchAxios({
+    url: '/users/reset/verify',
+    method: 'post',
+    data: { email, verifyCode }
+  })
 
+export const office365AuthService = async (token) =>
+  fetchAxios({
+    url: '/users/authenticate/office365',
+    method: 'post',
+    data: { token }
+  })
+
+export const getAuth = async () => {
+  const authenticated = JSON.parse(localStorage.getItem(config.LOCAL_AUTHENTICATED))
+  const role = authenticated?.user?.role
+  let refInfo
+
+  if (role === 'contractor') {
+    refInfo = await fetchAuth({
+      ignore401: true,
+      url: '/Sharepoints/',
+      params: {
+        url:
+          endpoints.getItems(config.EHS_GEMBA_SITE, 'Contractor') +
+          `?$filter=ContractorID eq '${authenticated.user.refID}'&top=1`
+      },
+      method: 'get'
+    })
+    refInfo = refInfo[0]
+  }
+
+  if (role === 'user') {
+    refInfo = await fetchAuth({
+      ignore401: true,
+      url: '/Sharepoints/',
+      params: {
+        url:
+          endpoints.getItems(config.EHS_GEMBA_SITE, 'UserInfo') +
+          `?$filter=UserID eq '${authenticated.user.refID}'&top=1`
+      },
+      method: 'get'
+    })
+    refInfo = refInfo[0]
+  }
+
+  const [account, user] = await Promise.all([
+    getItemService(lists.Accounts, authenticated.user.id),
+    getItemsService(lists.Users, {
+      filter: `ID eq ${authenticated.user.refID}`,
+      select:
+        'Title,FullName,Email,Phone,EmployeeType/Title,EmployeeType/ID,EmployeeType/EmployeeType,DepartmentName',
+      expand: 'EmployeeType'
+    })
+  ])
   const newProfile = {
     authenticated,
-    contractor: contractor.value[0],
-    account: account
+    user: user.value[0],
+    account: account,
+    refInfo: refInfo
   }
 
   return newProfile
@@ -51,6 +111,13 @@ export const getAttachmentFileService = async (list, storeID, fileName) =>
     params: { url: endpoints.getAttachment(list.site, list.listName, storeID, fileName) },
     method: 'get',
     responseType: 'blob'
+  })
+
+export const getAttachmentInfoService = async (list, storeID, fileName) =>
+  fetchAuth({
+    url: '/Sharepoints/',
+    params: { url: endpoints.getAttachmentInfo(list.site, list.listName, storeID, fileName) },
+    method: 'get'
   })
 
 export const getFilesService = async (
@@ -76,6 +143,13 @@ export const getFileService = async (site, serverRelativeUrl) =>
     params: { url: endpoints.getFile(site, serverRelativeUrl) },
     method: 'get',
     responseType: 'blob'
+  })
+
+export const getFileInfoService = async (site, serverRelativeUrl) =>
+  fetchAuth({
+    url: '/Sharepoints/',
+    params: { url: endpoints.getFileInfo(site, serverRelativeUrl) },
+    method: 'get'
   })
 
 export const uploadFileService = async (list, storeID, fileName, file, handlePercent) => {
@@ -184,4 +258,34 @@ export const updateListItemService = async (list, id, item) =>
     params: { url: endpoints.updateItem(list.site, list.listName, id) },
     data: item,
     method: 'put'
+  })
+
+// List Item with type
+/*export const getColumnsType = async (list) =>
+  fetchAuth({
+    url: '/Sharepoints/',
+    params: {
+      url: endpoints.getColumns(list.site, list.listName)
+    },
+    method: 'get',
+    headers: {
+      Accept: 'application/json;odata=nometadata'
+    }
+  })*/
+export const addFolderService = async (site, serverRelativeUrl) => {
+  return fetchAuth({
+    url: '/Sharepoints/item',
+    params: { url: endpoints.addFolder(site) },
+    data: {
+      ServerRelativeUrl: serverRelativeUrl
+    },
+    method: 'post'
+  })
+}
+
+export const deleteFolderService = async (site, serverRelativeUrl) =>
+  fetchAuth({
+    url: '/Sharepoints/',
+    params: { url: endpoints.deleteFolder(site, serverRelativeUrl) },
+    method: 'delete'
   })

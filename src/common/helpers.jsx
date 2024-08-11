@@ -3,6 +3,14 @@ import _ from 'lodash'
 import moment from 'moment'
 import dayjs from './dayjs'
 import { utils, writeFile } from 'xlsx'
+import {
+  faFile,
+  faFileExcel,
+  faFilePdf,
+  faFilePowerpoint,
+  faFileWord,
+  faImage
+} from '@fortawesome/free-solid-svg-icons'
 
 export function handleError(error, from) {
   let message = ''
@@ -28,11 +36,13 @@ export function handleError(error, from) {
   }
 
   message = JSON.stringify(message)
-
   if (message.indexOf('指定した名前は既に使用されています') > -1) {
     message = 'Tên file đã tồn tại'
   }
 
+  if (message.indexOf('The specified name is already in use.') > -1) {
+    message = 'Tên file đã tồn tại'
+  }
   console.error(`[handleError/${from}]`, message)
 
   return message
@@ -499,4 +509,47 @@ export const tiengVietKhongDau = (input) => {
   })
 
   return output
+}
+
+export const bytesToSize = (bytes) => {
+  const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB']
+  if (bytes === 0) return '0 Byte'
+  const i = parseInt(Math.floor(Math.log(bytes) / Math.log(1000)))
+  return Math.round(bytes / Math.pow(1000, i), 2) + ' ' + sizes[i]
+}
+
+export const getFileExtension = (filename) => {
+  // Tách chuỗi theo dấu chấm và lấy phần tử cuối cùng
+  const extension = filename?.split('.').pop()
+  return extension
+}
+
+export const getIconByFileType = (ext) => {
+  ext = ext.toLowerCase()
+  switch (ext) {
+    case 'pdf':
+      return faFilePdf
+    case 'xls':
+    case 'xlsx':
+      return faFileExcel
+    case 'doc':
+    case 'docx':
+    case 'docm':
+      return faFileWord
+    case 'pptm':
+    case 'pptx':
+      return faFilePowerpoint
+    case 'jpg':
+    case 'jpeg':
+    case 'png':
+    case 'gif':
+    case 'heic':
+      return faImage
+    default:
+      return faFile // default icon for unknown file types
+  }
+}
+
+export const removeGuidFromFileName = (fileName) => {
+  return fileName.split('_').slice(1).join('_')
 }

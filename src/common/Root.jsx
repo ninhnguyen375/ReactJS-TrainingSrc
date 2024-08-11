@@ -19,8 +19,44 @@ import dayjs from 'dayjs'
 
 import locale from 'antd/locale/vi_VN'
 import 'dayjs/locale/vi'
-import TodoListPage from '../components/TodoList/TodoListPage'
+import ImagesListPage from '../components/ImageAll/ImagesListPage'
+import AccountPage from '../components/Account/AccountPage'
+import DocumentStore from './components/DocumentStore/DocumentStore'
+import UserPage from '../components/User/UserPage'
+import { EventType, PublicClientApplication } from '@azure/msal-browser'
+import { office365MsalConfig } from '../office365AuthConfig'
+import { MsalProvider } from '@azure/msal-react'
+import RoutePitstopPage from '../components/Gemba/RoutePitstopPage'
+import GembaChecklist from '../components/Gemba/GembaChecklist'
+
+import EHSReportDetailPage from '../components/EHSReportDetailPage/EHSReportDetailPage'
+import EHSListPage from '../components/EHSListPage/EHSListPage'
 dayjs.locale('vi')
+
+/**
+ * MSAL should be instantiated outside of the component tree to prevent it from being re-instantiated on re-renders.
+ * For more, visit: https://github.com/AzureAD/microsoft-authentication-library-for-js/blob/dev/lib/msal-react/docs/getting-started.md
+ */
+
+export const msalInstance = new PublicClientApplication(office365MsalConfig)
+
+// Default to using the first account if no account is active on page load
+
+if (!msalInstance.getActiveAccount() && msalInstance.getAllAccounts().length > 0) {
+  // Account selection logic is app dependent. Adjust as needed for different use cases.
+
+  msalInstance.setActiveAccount(msalInstance.getAllAccounts()[0])
+}
+
+// Listen for sign-in event and set active account
+
+msalInstance.addEventCallback((event) => {
+  if (event.eventType === EventType.LOGIN_SUCCESS && event.payload.account) {
+    const account = event.payload.account
+
+    msalInstance.setActiveAccount(account)
+  }
+})
 
 const Root = () => {
   useEffect(() => {
@@ -32,53 +68,139 @@ const Root = () => {
   }, [])
 
   return (
-    <Provider store={store}>
-      <UIProvider>
-        {/* custom antd */}
-        <ConfigProvider
-          locale={locale}
-          theme={{
-            token: {
-              colorPrimary: '#5ac2dc'
-            }
-          }}>
-          {/* Router */}
-          <BrowserRouter>
-            <Routes>
-              {/* public routes */}
-              <Route path="/login" element={<LoginPage />} />
-              {/* <Route path="/forgot-password" element={<ForgotPassword />} /> */}
-              <Route path="/notfound" element={<NotFoundPage />} />
+    <MsalProvider instance={msalInstance}>
+      <Provider store={store}>
+        <UIProvider>
+          {/* custom antd */}
+          <ConfigProvider
+            locale={locale}
+            theme={{
+              token: {
+                colorPrimary: '#5ac2dc'
+              }
+            }}>
+            {/* Router */}
+            <BrowserRouter>
+              <Routes>
+                {/* public routes */}
+                <Route path="/login" element={<LoginPage />} />
+                {/* <Route path="/forgot-password" element={<ForgotPassword />} /> */}
+                <Route path="/notfound" element={<NotFoundPage />} />
 
-              {/* auth routes */}
-              <Route element={<AuthProvider />}>
-                <Route path="/change-password" element={<ChangePasswordPage />} />
-                <Route
-                  path="/todo-list"
-                  element={
-                    <MainLayout>
-                      <TodoListPage />
-                    </MainLayout>
-                  }
-                />
+                {/* auth routes */}
+                <Route element={<AuthProvider />}>
+                  <Route path="/change-password" element={<ChangePasswordPage />} />
 
-                <Route
-                  path="/"
-                  element={
-                    <MainLayout>
-                      <HomePage />
-                    </MainLayout>
-                  }
-                />
-              </Route>
+                  <Route
+                    path="/"
+                    element={
+                      <MainLayout>
+                        <HomePage />
+                      </MainLayout>
+                    }
+                  />
 
-              {/* notfound */}
-              <Route path="*" element={<NotFoundPage />} />
-            </Routes>
-          </BrowserRouter>
-        </ConfigProvider>
-      </UIProvider>
-    </Provider>
+                  <Route
+                    path="/Images_List_Page"
+                    element={
+                      <MainLayout>
+                        <ImagesListPage></ImagesListPage>
+                      </MainLayout>
+                    }></Route>
+                  <Route
+                    path="/account"
+                    element={
+                      <MainLayout>
+                        <AccountPage />
+                      </MainLayout>
+                    }
+                  />
+                  <Route
+                    path="/documentstore"
+                    element={
+                      <MainLayout>
+                        <DocumentStore mode="View" list={lists.DocumentStore} storeID={79} />
+                      </MainLayout>
+                    }
+                  />
+
+                  <Route
+                    path="/user"
+                    element={
+                      <MainLayout>
+                        <UserPage />
+                      </MainLayout>
+                    }
+                  />
+
+                  <Route
+                    path="/gemba/route-pitstop/follow"
+                    element={
+                      <MainLayout>
+                        <RoutePitstopPage mode={'follow'} />
+                      </MainLayout>
+                    }
+                  />
+
+                  <Route
+                    path="/gemba/route-pitstop/update-standard"
+                    element={
+                      <MainLayout>
+                        <RoutePitstopPage mode={'update'} />
+                      </MainLayout>
+                    }
+                  />
+
+                  <Route
+                    path="/gemba/route-pitstop/follow/:id"
+                    element={
+                      <MainLayout>
+                        <GembaChecklist mode="new" />
+                      </MainLayout>
+                    }
+                  />
+                  <Route
+                    path="/ehs"
+                    element={
+                      <MainLayout>
+                        <EHSListPage />
+                      </MainLayout>
+                    }
+                  />
+                  <Route
+                    path="/ehs-report/create/:ReportSubjectID"
+                    element={
+                      <MainLayout>
+                        <EHSReportDetailPage />
+                      </MainLayout>
+                    }
+                  />
+                  <Route
+                    path="/ehs-report/detail/:id"
+                    element={
+                      <MainLayout>
+                        <EHSReportDetailPage />
+                      </MainLayout>
+                    }
+                  />
+                  <Route
+                    path="/ehs"
+                    element={
+                      <MainLayout>
+                        <EHSListPage />
+                      </MainLayout>
+                    }
+                  />
+                </Route>
+
+                {/* notfound */}
+                <Route path="*" element={<NotFoundPage />} />
+              </Routes>
+            </BrowserRouter>
+          </ConfigProvider>
+        </UIProvider>
+      </Provider>
+    </MsalProvider>
   )
 }
 

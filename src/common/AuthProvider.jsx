@@ -1,11 +1,10 @@
 import React, { createContext, useContext, useEffect, useState } from 'react'
 import { Navigate, Outlet, useLocation, useNavigate } from 'react-router-dom'
-import { batchPromises, handleError } from './helpers'
-import { getAuth, getItemsService, refreshTokenService } from './services'
+import { handleError } from './helpers'
+import { getAuth, refreshTokenService } from './services'
 import { useReadLocalStorage } from 'usehooks-ts'
 import LoadingPage from './components/LoadingPage'
 import { useDispatch } from 'react-redux'
-import lists from './lists'
 import { commonActions } from '../store/common'
 import config from './config'
 
@@ -14,6 +13,7 @@ const AuthContext = createContext(null)
 const AuthProvider = () => {
   // localStorage
   const [profile, setProfile] = useState(useReadLocalStorage(config.LOCAL_PROFILE))
+  const [loginType, setLoginType] = useState(useReadLocalStorage(config.LOCAL_LOGIN_TYPE))
   // state
   const [isGettingUser, setIsGettingUser] = useState(true)
   const [isRefreshPage, setIsRefreshPage] = useState(true)
@@ -24,12 +24,14 @@ const AuthProvider = () => {
   const dispatch = useDispatch()
 
   const logout = () => {
-    localStorage.clear(config.LOCAL_PROFILE)
-    localStorage.clear(config.LOCAL_AUTHENTICATED)
-    localStorage.clear(config.LOCAL_ACCESS_TOKEN)
-    localStorage.clear(config.LOCAL_REFRESH_TOKEN)
+    localStorage.removeItem(config.LOCAL_PROFILE)
+    localStorage.removeItem(config.LOCAL_AUTHENTICATED)
+    localStorage.removeItem(config.LOCAL_ACCESS_TOKEN)
+    localStorage.removeItem(config.LOCAL_REFRESH_TOKEN)
+    localStorage.removeItem(config.LOCAL_LOGIN_TYPE)
 
     setProfile()
+    setLoginType()
 
     navigate('/login', {
       state: {
@@ -70,38 +72,7 @@ const AuthProvider = () => {
 
   const getWorkLocationAndMapping = async () => {
     try {
-      let filterTest = config.IN_TEST ? '' : ` and Status eq 'Activated'`
-      let data = await batchPromises([
-        () =>
-          getItemsService(lists.WorkLocation, {
-            filter: `WorkLocationType eq 'Nhà máy' ${filterTest}`
-          }),
-        () => getItemsService(lists.WorkLocationSlotMapping)
-      ])
-
-      let workLocation = data[0].value
-      let mapping = data[1].value
-
-      workLocation = workLocation.map((wl) => ({
-        ...wl,
-        MappingID: mapping.find((map) => map.WorkLocationID === wl.Title)?.SlotID || wl.Title,
-        WorkLocationID: wl.Title
-      }))
-
-      if (config.IN_TEST) {
-        workLocation = [
-          ...workLocation,
-          {
-            ID: 999,
-            WorkLocationID: 'TEST',
-            WorkingLocationName: 'TEST',
-            WorkLocation_VIE: 'TEST',
-            WorkLocation_EN: 'TEST',
-            MappingID: 'TEST',
-            Status: 'Activated'
-          }
-        ]
-      }
+      let workLocation = []
 
       dispatch(commonActions.setWorkLocationList(workLocation))
     } catch (error) {
@@ -133,19 +104,19 @@ const AuthProvider = () => {
     return <LoadingPage open={true} />
   }
 
-  if (
-    profile &&
-    !isRefreshPage &&
-    location.pathname !== '/term' &&
-    profile.account &&
-    !profile.account.IsAcceptedTerm
-  ) {
-    return <Navigate to="/term" state={{ returnUrl: location.pathname }} />
-  }
+  // if (
+  //   profile &&
+  //   !isRefreshPage &&
+  //   location.pathname !== '/term' &&
+  //   profile.account &&
+  //   !profile.account.IsAcceptedTerm
+  // ) {
+  //   return <Navigate to="/term" state={{ returnUrl: location.pathname }} />
+  // }
 
   if (profile && !isRefreshPage) {
     return (
-      <AuthContext.Provider value={{ profile, logout, fetchUser }}>
+      <AuthContext.Provider value={{ profile, logout, fetchUser, loginType }}>
         <Outlet />
       </AuthContext.Provider>
     )
@@ -157,8 +128,8 @@ const AuthProvider = () => {
 }
 
 export function useAuth() {
-  const { profile, logout, fetchUser } = useContext(AuthContext)
-  return { profile, logout, fetchUser }
+  const { profile, logout, fetchUser, loginType } = useContext(AuthContext)
+  return { profile, logout, fetchUser, loginType }
 }
 
 export default AuthProvider

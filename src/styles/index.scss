@@ -33,9 +33,9 @@ a {
   background-color: #f3fafc;
 }
 
-.ant-menu-root.ant-menu-inline.ant-menu-light {
-  border: none;
-}
+// .ant-menu-root.ant-menu-inline.ant-menu-light {
+//   border: none;
+// }
 
 $varSpacer: 1rem;
 $varSubHeader: 65px;
@@ -92,7 +92,7 @@ $varHeaderHeight: 65px;
     padding: 10px;
     width: 141px;
   }
-  .logo-EHS {
+  .Logo {
     padding: 10px;
     width: 95px;
     margin: 0 0px;
@@ -115,9 +115,8 @@ $varHeaderHeight: 65px;
       background: white;
       margin: 5px;
       padding: 10px 15px;
-      border-radius: 999px;
+      border-radius: 7px;
       height: 50px;
-      border: 1px solid #5ac2dc;
       font-weight: bold;
 
       img {
@@ -127,6 +126,7 @@ $varHeaderHeight: 65px;
     }
 
     .active {
+      color: $primaryColor;
       background: #cce7f6;
     }
   }
@@ -356,6 +356,58 @@ input[disabled],
   color: black !important;
   background-color: #00000003 !important;
 }
+
+//menu
+.ant-menu-root {
+  border: none;
+  background-color: transparent;
+}
+
+.ant-menu-item {
+  padding: 5px;
+  height: auto !important;
+}
+
+.ant-menu-submenu-title {
+  font-size: 13px;
+  padding: 5px;
+  height: auto !important;
+}
+
+.ant-menu-item .ant-menu-submenu-title {
+  border-radius: 7px;
+  font-weight: bold;
+  margin: 5px;
+  padding: 10px 15px;
+}
+
+.ant-menu-item-selected {
+  background-color: $primaryColor !important;
+  color: white !important;
+}
+// end menu
+
+// sub menu
+.ant-menu-title-content {
+  font-size: 13px;
+  height: auto !important;
+  padding: 10px 5px;
+  font-weight: bold;
+  line-height: 15px;
+  line-break: auto;
+  white-space: normal; /* Cho phép xuống dòng */
+  word-wrap: break-word;
+}
+
+.ant-menu-submenu-inline {
+  display: flex;
+  flex-direction: column;
+}
+
+.ant-menu-sub .ant-menu-inline {
+  height: auto !important;
+}
+//end sub menu
 
 .divider.primary {
   height: 5px;

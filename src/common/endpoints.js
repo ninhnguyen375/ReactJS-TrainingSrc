@@ -12,6 +12,8 @@ export default {
     `${list(site, listName)}/items(${storeID})/AttachmentFiles`,
   getAttachment: (site, listName, storeID, fileName) =>
     `${list(site, listName)}/items(${storeID})/AttachmentFiles('${fileName}')/$value`,
+  getAttachmentInfo: (site, listName, storeID, fileName) =>
+    `${list(site, listName)}/items(${storeID})/AttachmentFiles('${fileName}')`,
   addAttachment: (site, listName, storeID, fileName) =>
     `${list(site, listName)}/items(${storeID})/AttachmentFiles/Add(FileName='${fileName}')`,
   updateAttachment: (site, listName, storeID, fileName) =>
@@ -21,10 +23,15 @@ export default {
   // File
   getFile: (site, serverRelativeUrl) =>
     `${site}/_api/web/GetFileByServerRelativeUrl('${serverRelativeUrl}')/$value`,
+  getFileInfo: (site, serverRelativeUrl) =>
+    `${site}/_api/web/GetFileByServerRelativeUrl('${serverRelativeUrl}')`,
   addFile: (site, folder, fileName) =>
     `${site}/_api/web/GetFolderByServerRelativeUrl('${folder}')/Files/Add(url='${fileName}', overwrite=true)`,
   updateFile: (site, serverRelativeUrl) =>
     `${site}/_api/web/GetFileByServerRelativeUrl('${serverRelativeUrl}')/$value`,
   deleteFile: (site, serverRelativeUrl) =>
-    `${site}/_api/web/GetFileByServerRelativeUrl('${serverRelativeUrl}')`
+    `${site}/_api/web/GetFileByServerRelativeUrl('${serverRelativeUrl}')`,
+  addFolder: (site) => `${site}/_api/web/folders`,
+  deleteFolder: (site, serverRelativeUrl) =>
+    `${site}/_api/web/GetFolderByServerRelativeUrl('${serverRelativeUrl}')`
 }

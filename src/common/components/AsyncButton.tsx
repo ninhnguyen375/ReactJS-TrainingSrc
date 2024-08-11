@@ -1,10 +1,7 @@
 import React, { useState } from 'react'
-import { Button } from 'antd'
-import { ButtonProps } from 'antd/lib/button'
+import { Button, ButtonProps } from 'antd'
 
 function isPromise(value: unknown): value is Promise<unknown> {
-  // ref: https://stackoverflow.com/questions/27746304/how-do-i-tell-if-an-object-is-a-promise
-
   return (
     typeof value === 'object' &&
     value !== null &&
@@ -13,31 +10,31 @@ function isPromise(value: unknown): value is Promise<unknown> {
   )
 }
 
-export default function AsyncButton({
+interface AsyncButtonProps extends ButtonProps {
+  onClick?: (e: React.MouseEvent<HTMLElement, MouseEvent>) => void | Promise<void>
+}
+
+const AsyncButton: React.FC<AsyncButtonProps> = ({
   onClick,
   loading: primitiveLoading,
   ...restProps
-}: ButtonProps) {
+}) => {
   const [isHandlingClick, setHandlingClick] = useState<boolean>(false)
 
   return (
     <Button
       {...restProps}
       loading={primitiveLoading === undefined ? isHandlingClick : primitiveLoading}
-      onClick={async (...args) => {
+      onClick={async (e) => {
         if (typeof onClick === 'function' && !isHandlingClick) {
-          const returnValue = onClick(...args) as unknown
+          const returnValue = onClick(e)
 
           if (isPromise(returnValue)) {
-            // If "onClick" function return a Promise
-            // According to the status of Promise, switch loading automatically.
             try {
               setHandlingClick(true)
               await returnValue
+            } finally {
               setHandlingClick(false)
-            } catch (e) {
-              setHandlingClick(false)
-              throw e
             }
           }
         }
@@ -45,3 +42,5 @@ export default function AsyncButton({
     />
   )
 }
+
+export default AsyncButton

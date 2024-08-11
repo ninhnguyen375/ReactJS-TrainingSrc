@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { useUI } from '../../common/UIProvider'
 import { useNavigate } from 'react-router-dom'
-import { Form, Button, Input } from 'antd'
+import { Form, Button, Input, Checkbox } from 'antd'
 import { handleError } from '../../common/helpers'
 import { useForm } from 'antd/es/form/Form'
 import { changePasswordService, updateListItemService } from '../../common/services'
@@ -14,7 +14,7 @@ const ChangePasswordPage = () => {
   const [form] = useForm()
   const returnUrl = location.state?.returnUrl || '/'
   const [loading, setLoading] = useState(false)
-  const { profile } = useAuth()
+  const { profile, logout } = useAuth()
 
   const handleSubmit = async () => {
     try {
@@ -40,6 +40,10 @@ const ChangePasswordPage = () => {
       await updateListItemService(lists.Accounts, profile.account.ID, {
         RawPassword: values.newPassword
       })
+
+      if (values.logoutFromAllDevices) {
+        await logout()
+      }
 
       ui.notiSuccess('Thay đổi thành công')
 
@@ -103,6 +107,10 @@ const ChangePasswordPage = () => {
                 })
               ]}>
               <Input.Password />
+            </Form.Item>
+
+            <Form.Item name="logoutFromAllDevices" valuePropName="checked">
+              <Checkbox>Đăng xuất khỏi tất cả các thiết bị</Checkbox>
             </Form.Item>
 
             <div className="text-end pt-3">

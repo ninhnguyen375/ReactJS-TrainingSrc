@@ -20,8 +20,9 @@ const AcceptTerm = () => {
   const getTerm = async () => {
     setLoading(true)
     try {
-      const term = await getItemService(lists.Term, 1)
-      setTermItem(term)
+      // const term = await getItemService(lists.Term, 1)
+      // setTermItem(term)
+      setTermItem()
     } catch (error) {
       handleError(error)
     }

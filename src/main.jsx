@@ -11,5 +11,6 @@ import './styles/change-password-page.scss'
 import './styles/forgot-password-page.scss'
 import './styles/nprogress.scss'
 import './styles/home.scss'
+import './index.css'
 
 ReactDOM.createRoot(document.getElementById('root')).render(<Root />)

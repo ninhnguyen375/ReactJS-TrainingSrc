@@ -8,7 +8,7 @@
 
   .login-page-container {
     width: 385px;
-    height: 329px;
+    height: 60vh;
     background: white;
     position: absolute;
     top: 50%;
@@ -20,6 +20,20 @@
 
     .login-page-container-logo {
       width: 100px;
+    }
+    .optional-login-item{
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      justify-content: center;
+      
+    }
+    .optional-login-image{
+      width:20px;
+    }
+    .optional-login-text{
+      font-size: 12px;
+
     }
   }
 }
